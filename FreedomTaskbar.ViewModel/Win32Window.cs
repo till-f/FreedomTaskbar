@@ -1,6 +1,7 @@
 ﻿using FreedomTaskbar.Core;
 using System.Text;
 using System.Windows;
+using System.Windows.Media;
 
 namespace FreedomTaskbar.ViewModel;
 
@@ -29,6 +30,13 @@ public class Win32Window : DependencyObject
   {
     get => (string)GetValue(TitleProperty);
     set => SetValue(TitleProperty, value);
+  }
+
+  public static readonly DependencyProperty IconProperty = RegisterProperty(x => x.Icon);
+  public ImageSource Icon
+  {
+    get => (ImageSource)GetValue(IconProperty);
+    set => SetValue(IconProperty, value);
   }
 
   public static readonly DependencyProperty IsForegroundWindowProperty = RegisterProperty(x => x.IsForegroundWindow);

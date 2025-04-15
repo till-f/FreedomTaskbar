@@ -5,7 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FreedomTaskbar"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Freedom Taskbar"
+        Topmost="True"
+        WindowStyle="None"
+        d:DesignWidth="300"
+        d:DesignHeight="600">
     <Grid>
       <StackPanel Name="WindowsStackPanel" Orientation="Vertical">
       </StackPanel>

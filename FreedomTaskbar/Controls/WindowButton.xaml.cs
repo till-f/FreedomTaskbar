@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using FreedomTaskbar.Core;
 using FreedomTaskbar.ViewModel;
@@ -32,9 +30,6 @@ public partial class WindowButton : UserControl
 
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
-    Debug.WriteLine($"Activating window '{Win32Window.Title}'");
-    Win32.ShowWindow(Win32Window.Handle, Win32.SW_SHOWNORMAL);
-    //Win32.SetWindowPos(Win32Window.Handle, 0, 0, 0, 0, 0, 0x0002 | 0x0001);
-    Win32.SetForegroundWindow(Win32Window.Handle);
+    Win32.SwitchToThisWindow(Win32Window.Handle, true);
   }
 }

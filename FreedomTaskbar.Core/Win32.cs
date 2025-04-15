@@ -34,6 +34,9 @@ public class Win32
   public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
   [DllImport("User32.dll")]
+  public static extern bool SwitchToThisWindow(IntPtr hWnd, bool isTabbedToWindow);
+  
+  [DllImport("User32.dll")]
   public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, int flags);
 
   [DllImport("User32.dll")]
