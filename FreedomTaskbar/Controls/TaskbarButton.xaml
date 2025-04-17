@@ -6,29 +6,44 @@
              xmlns:local="clr-namespace:FreedomTaskbar.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="200"
-             Name="ThisWindowButton">
-  <Button Name="InnerButton" HorizontalContentAlignment="Left">
+             Name="ThisTaskbarButton">
+  <Button x:Name="InnerButton"
+                   HorizontalContentAlignment="Left"
+                   Margin="0, 0, 0, 1"
+                   Foreground="White"
+                   Background="{x:Static local:TaskbarButton.ColorInactive}"
+                   BorderThickness="0">
+    <Button.Style>
+      <Style TargetType="{x:Type Button}">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type Button}">
+              <!-- This is needed to get rid of the default highlighting color -->
+              <Border Background="{TemplateBinding Background}">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </Button.Style>
+
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <Image Source="{Binding ElementName=ThisWindowButton, Path=Window.Icon}"
+      <Image Source="{Binding ElementName=ThisTaskbarButton, Path=Window.Icon}"
              Height="32"
              Margin="5"
              RenderOptions.BitmapScalingMode="HighQuality"
              Grid.Column="0" />
-      <TextBlock Text="{Binding ElementName=ThisWindowButton, Path=Window.Title}"
+      <TextBlock Text="{Binding ElementName=ThisTaskbarButton, Path=Window.Title}"
                  Padding="5"
                  FontSize="14"
                  VerticalAlignment="Center"
                  TextTrimming="CharacterEllipsis"
                  Grid.Column="1" />
-      <!-- <TextBlock Text="Hello World Button! This is very long Text" -->
-      <!--            Padding="5" -->
-      <!--            FontSize="14" -->
-      <!--            TextTrimming="CharacterEllipsis" -->
-      <!--            Grid.Column="1" /> -->
     </Grid>
   </Button>
 </UserControl>

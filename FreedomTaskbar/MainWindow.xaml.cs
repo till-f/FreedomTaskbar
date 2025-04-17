@@ -52,7 +52,7 @@ public partial class MainWindow : Window
   private void RefreshWindowList()
   {
     var foregroundWindow = Win32.GetForegroundWindow();
-    var newWindows = Win32Utils.GetOpenWindows().Select(it => new OsWindow(it, foregroundWindow)).ToList();
+    var newWindows = Win32Utils.GetOpenWindows().ToList();
     var taskBarButtons = WindowsStackPanel.Children.OfType<TaskbarButton>().ToList();
 
     foreach (var taskBarButton in taskBarButtons)
@@ -64,17 +64,24 @@ public partial class MainWindow : Window
         // window for the taskbar button does not exist anymore => remove the button
         WindowsStackPanel.Children.Remove(taskBarButton);
       }
+      else
+      {
+        // button already exists => refresh
+        taskBarButton.Window.Refresh(foregroundWindow);
+      }
     }
 
     // add new buttons for remaining windows that did not exist before
     foreach (var window in newWindows)
     {
-      if (_excludedWindows.Any(r => Regex.IsMatch(window.Title, r)))
+      var osWindow = new OsWindow(window, foregroundWindow);
+
+      if (_excludedWindows.Any(r => Regex.IsMatch(osWindow.Title, r)))
       {
         continue;
       }
 
-      WindowsStackPanel.Children.Add(new TaskbarButton(window));
+      WindowsStackPanel.Children.Add(new TaskbarButton(osWindow));
     }
   }
 }
