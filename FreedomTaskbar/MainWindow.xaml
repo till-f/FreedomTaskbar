@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FreedomTaskbar"
         mc:Ignorable="d"
-        Title="Freedom Taskbar"
+        Title="{x:Static local:MainWindow.MainWindowTitle}"
         Topmost="True"
+        ShowInTaskbar="False"
         WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#1C1C1C"
         d:DesignWidth="300"
         d:DesignHeight="600">
     <Grid>

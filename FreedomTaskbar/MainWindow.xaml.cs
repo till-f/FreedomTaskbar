@@ -13,9 +13,11 @@ namespace FreedomTaskbar;
 /// </summary>
 public partial class MainWindow : Window
 {
+  public const string MainWindowTitle = "Freedom Taskbar";
+
   private readonly Timer _updateTimer;
 
-  private readonly List<string> _excludedWindows = ["Settings", "BBar", "Windows Input Experience"];
+  private readonly List<string> _excludedWindows = ["Settings", "BBar", "Windows Input Experience", MainWindowTitle];
 
   public MainWindow()
   {
@@ -38,21 +40,34 @@ public partial class MainWindow : Window
 
   private void SetPosition()
   {
+    int strangeWindowPaddingY = -16;
+
     var width = 200;
     Top = 0;
     Left = SystemParameters.PrimaryScreenWidth - width;
-    Height = SystemParameters.MaximizedPrimaryScreenHeight;
+    Height = SystemParameters.MaximizedPrimaryScreenHeight + strangeWindowPaddingY;
     Width = width;
   }
 
   private void RefreshWindowList()
   {
     var foregroundWindow = Win32.GetForegroundWindow();
-    var windows = Win32Utils.GetOpenWindows().Select(it => new OsWindow(it, foregroundWindow));
+    var newWindows = Win32Utils.GetOpenWindows().Select(it => new OsWindow(it, foregroundWindow)).ToList();
+    var taskBarButtons = WindowsStackPanel.Children.OfType<TaskbarButton>().ToList();
 
-    WindowsStackPanel.Children.Clear();
+    foreach (var taskBarButton in taskBarButtons)
+    {
+      // count (and skip) windows that already have taskbar button
+      var removedCount = newWindows.RemoveAll(it => it.Handle == taskBarButton.Window.Handle);
+      if (removedCount == 0)
+      {
+        // window for the taskbar button does not exist anymore => remove the button
+        WindowsStackPanel.Children.Remove(taskBarButton);
+      }
+    }
 
-    foreach (var window in windows)
+    // add new buttons for remaining windows that did not exist before
+    foreach (var window in newWindows)
     {
       if (_excludedWindows.Any(r => Regex.IsMatch(window.Title, r)))
       {

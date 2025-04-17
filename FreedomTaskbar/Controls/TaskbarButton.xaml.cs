@@ -31,11 +31,8 @@ public partial class TaskbarButton : UserControl
 
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
-    Dispatcher.InvokeAsync(() =>
-    {
-      Win32.SetActiveWindow(Window.Handle);
-      //Win32.SwitchToThisWindow(Window.Handle, true);
-      //Win32.SetForegroundWindow(OsWindow.Handle);
-    });
+    Win32.SwitchToThisWindow(Window.Handle, true);
+    //Win32.SetActiveWindow(Window.Handle);
+    //Win32.SetForegroundWindow(OsWindow.Handle);
   }
 }
