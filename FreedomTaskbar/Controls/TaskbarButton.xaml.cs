@@ -44,8 +44,6 @@ public partial class TaskbarButton : UserControl
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
     Win32.SwitchToThisWindow(Window.Handle, true);
-    //Win32.SetActiveWindow(Window.Handle);
-    //Win32.SetForegroundWindow(OsWindow.Handle);
   }
 
   private void OnIsActiveChanged(bool oldValue, bool newValue)

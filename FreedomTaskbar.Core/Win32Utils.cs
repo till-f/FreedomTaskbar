@@ -16,8 +16,13 @@ public static class Win32Utils
       {
         return true;
       }
-
+      
       if (!Win32.IsWindowVisible(hWnd))
+      {
+        return true;
+      }
+
+      if (!IsShownInTaskBar(hWnd))
       {
         return true;
       }
@@ -28,19 +33,36 @@ public static class Win32Utils
         return true;
       }
 
-      windows.Add(new Win32Window(hWnd));
+      var processId = GetProcessIdForWindowHandle(hWnd);
+      if (processId == null)
+      {
+        return true;
+      }
+
+      windows.Add(new Win32Window(hWnd, processId.Value));
       return true;
     }, 0);
 
     return windows;
   }
 
+  public static int? GetProcessIdForWindowHandle(IntPtr hWnd)
+  {
+    var result = Win32.GetWindowThreadProcessId(hWnd, out uint processId);
+    if (result == 0)
+    {
+      return null;
+    }
+
+    return (int)processId;
+  }
+
   public static string? GetExecutablePathForWindow(IntPtr hWnd)
   {
     try
     {
-      var result = Win32.GetWindowThreadProcessId(hWnd, out uint processId);
-      if (result == 0)
+      var processId = GetProcessIdForWindowHandle(hWnd);
+      if (processId == null)
       {
         return null;
       }
@@ -52,5 +74,35 @@ public static class Win32Utils
     {
       return null;
     }
+  }
+
+  public static bool IsShownInTaskBar(IntPtr hWnd)
+  {
+    ulong WS_POPUP   = 0x80000000L;
+    ulong WS_CHILD   = 0x40000000L;
+    ulong WS_VISIBLE = 0x10000000L;
+
+    ulong WS_EX_APPWINDOW = 0x00040000L;
+    ulong WS_EX_TOOLWINDOW = 0x00000080L;
+    ulong WS_EX_NOACTIVATE = 0x08000000L;
+
+    Win32.WINDOWINFO wi = new ();
+    Win32.GetWindowInfo(hWnd, ref wi);
+
+    // Extended styles
+    var isAppWindow = (wi.dwExStyle & WS_EX_APPWINDOW) != 0L;
+    var isNotToolWindow = (wi.dwExStyle & WS_EX_TOOLWINDOW) == 0L;
+    var isNotInactiveWindow = (wi.dwExStyle & WS_EX_NOACTIVATE) == 0L;
+
+    var condition1 = isAppWindow || (isNotToolWindow && isNotInactiveWindow);
+    if (condition1) return true;
+
+    // Basic styles
+    var isNotPopupWindow = (wi.dwStyle & WS_POPUP) == 0L;
+    var isNotChildWindow = (wi.dwStyle & WS_CHILD) == 0L;
+    var isVisible = (wi.dwStyle & WS_VISIBLE) != 0L;
+
+    var condition2 = isNotPopupWindow && isNotChildWindow && isVisible;
+    return condition2;
   }
 }
