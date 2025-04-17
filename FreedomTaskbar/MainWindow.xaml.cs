@@ -2,7 +2,8 @@
 using System.Timers;
 using System.Windows;
 using FreedomTaskbar.Controls;
-using FreedomTaskbar.FrameworkExtensions;
+using FreedomTaskbar.Core;
+using FreedomTaskbar.ViewModel;
 using Timer = System.Timers.Timer;
 
 namespace FreedomTaskbar;
@@ -46,7 +47,8 @@ public partial class MainWindow : Window
 
   private void RefreshWindowList()
   {
-    var windows = Win32Utils.GetOpenWindows();
+    var foregroundWindow = Win32.GetForegroundWindow();
+    var windows = Win32Utils.GetOpenWindows().Select(it => new OsWindow(it, foregroundWindow));
 
     WindowsStackPanel.Children.Clear();
 

@@ -8,7 +8,7 @@ using Expression = System.Linq.Expressions.Expression;
 
 #pragma warning disable CS8618, CS9264
 
-namespace FreedomTaskbar.FrameworkExtensions
+namespace FreedomTaskbar.WpfExtensions
 {
   public delegate void PropertyChangedCallback<TOwner>(TOwner sender, DependencyPropertyChangedEventArgs e) where TOwner : DependencyObject;
 

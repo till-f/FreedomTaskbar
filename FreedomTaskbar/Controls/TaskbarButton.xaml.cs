@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using FreedomTaskbar.Core;
-using FreedomTaskbar.FrameworkExtensions;
 using FreedomTaskbar.ViewModel;
+using FreedomTaskbar.WpfExtensions;
 
 namespace FreedomTaskbar.Controls;
 
@@ -13,24 +13,29 @@ using static DependencyPropertyRegistrar<TaskbarButton>;
 /// </summary>
 public partial class TaskbarButton : UserControl
 {
-  public TaskbarButton(OsWindow osWindow)
+  public TaskbarButton(OsWindow window)
   {
     InitializeComponent();
 
-    OsWindow = osWindow;
+    Window = window;
 
     InnerButton.Click += OnInnerButtonClicked;
   }
 
-  public static readonly DependencyProperty OsWindowProperty = RegisterProperty(x => x.OsWindow);
-  public OsWindow OsWindow
+  public static readonly DependencyProperty WindowProperty = RegisterProperty(x => x.Window);
+  public OsWindow Window
   {
-    get => (OsWindow)GetValue(OsWindowProperty);
-    set => SetValue(OsWindowProperty, value);
+    get => (OsWindow)GetValue(WindowProperty);
+    set => SetValue(WindowProperty, value);
   }
 
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
-    Win32.SwitchToThisWindow(OsWindow.Handle, true);
+    Dispatcher.InvokeAsync(() =>
+    {
+      Win32.SetActiveWindow(Window.Handle);
+      //Win32.SwitchToThisWindow(Window.Handle, true);
+      //Win32.SetForegroundWindow(OsWindow.Handle);
+    });
   }
 }

@@ -34,6 +34,9 @@ public class Win32
   public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
   [DllImport("User32.dll")]
+  public static extern IntPtr SetActiveWindow(IntPtr hWnd);
+
+  [DllImport("User32.dll")]
   public static extern bool SwitchToThisWindow(IntPtr hWnd, bool isTabbedToWindow);
   
   [DllImport("User32.dll")]
@@ -41,6 +44,9 @@ public class Win32
 
   [DllImport("User32.dll")]
   public static extern IntPtr GetShellWindow();
+
+  [DllImport("user32.dll", SetLastError = true)]
+  public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
   /// <summary>
   /// Hides the window and activates another window.
