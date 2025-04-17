@@ -12,28 +12,18 @@ public static class Win32Utils
 
     Win32.EnumWindows(delegate (nint hWnd, int _)
     {
-      if (hWnd == shellWindow)
-      {
-        return true;
-      }
-      
-      if (!Win32.IsWindowVisible(hWnd))
+      // if (!Win32.IsWindowVisible(hWnd))
+      // {
+      //   return true;
+      // }
+
+      var rootWindowHandle = GetRootWindow(hWnd);
+      if (hWnd == rootWindowHandle && !IsApplicableForRootWindow(hWnd, shellWindow))
       {
         return true;
       }
 
-      if (!IsShownInTaskBar(hWnd))
-      {
-        return true;
-      }
-
-      var length = Win32.GetWindowTextLength(hWnd);
-      if (length == 0)
-      {
-        return true;
-      }
-
-      windows.Add(new Win32Window(hWnd, GetRootWindow(hWnd)));
+      windows.Add(new Win32Window(hWnd, rootWindowHandle));
       return true;
     }, 0);
 
@@ -64,7 +54,7 @@ public static class Win32Utils
     return (int)processId;
   }
 
-  public static string? GetExecutablePathForWindow(IntPtr hWnd)
+  public static Process? GetProcessForWindowHandle(IntPtr hWnd)
   {
     try
     {
@@ -74,8 +64,7 @@ public static class Win32Utils
         return null;
       }
 
-      var process = Process.GetProcessById((int)processId);
-      return process.MainModule?.FileName;
+      return Process.GetProcessById((int)processId);
     }
     catch (Exception)
     {
@@ -83,33 +72,26 @@ public static class Win32Utils
     }
   }
 
-  public static bool IsShownInTaskBar(IntPtr hWnd)
+  public static bool IsApplicableForRootWindow(IntPtr hWnd, IntPtr shellWindow)
   {
-    ulong WS_POPUP   = 0x80000000L;
-    ulong WS_CHILD   = 0x40000000L;
-    ulong WS_VISIBLE = 0x10000000L;
-
-    ulong WS_EX_APPWINDOW = 0x00040000L;
-    ulong WS_EX_TOOLWINDOW = 0x00000080L;
-    ulong WS_EX_NOACTIVATE = 0x08000000L;
+    if (hWnd == shellWindow)
+    {
+      return false;
+    }
 
     Win32.WINDOWINFO wi = new ();
     Win32.GetWindowInfo(hWnd, ref wi);
+    
+    // Skip Invisible, Popup or Child windows
+    if ((wi.dwStyle & Win32.WS_VISIBLE) == 0L
+        || (wi.dwStyle & Win32.WS_POPUP) != 0L
+        || (wi.dwStyle & Win32.WS_CHILD) != 0L)
+    {
+      return false;
+    }
 
-    // Extended styles
-    var isAppWindow = (wi.dwExStyle & WS_EX_APPWINDOW) != 0L;
-    var isNotToolWindow = (wi.dwExStyle & WS_EX_TOOLWINDOW) == 0L;
-    var isNotInactiveWindow = (wi.dwExStyle & WS_EX_NOACTIVATE) == 0L;
-
-    var condition1 = isAppWindow || (isNotToolWindow && isNotInactiveWindow);
-    if (condition1) return true;
-
-    // Basic styles
-    var isNotPopupWindow = (wi.dwStyle & WS_POPUP) == 0L;
-    var isNotChildWindow = (wi.dwStyle & WS_CHILD) == 0L;
-    var isVisible = (wi.dwStyle & WS_VISIBLE) != 0L;
-
-    var condition2 = isNotPopupWindow && isNotChildWindow && isVisible;
-    return condition2;
+    // Skip ToolWindow and NoActive windows, if not explicitly marked as AppWindow
+    return (wi.dwExStyle & Win32.WS_EX_APPWINDOW) != 0L
+           || ((wi.dwExStyle & Win32.WS_EX_TOOLWINDOW) == 0L && (wi.dwExStyle & Win32.WS_EX_NOACTIVATE) == 0L);
   }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,6 +33,8 @@ public partial class TaskbarButton : UserControl
     InnerButton.Click += OnInnerButtonClicked;
     InnerButton.MouseEnter += OnInnerButtonMouseEntered;
     InnerButton.MouseLeave += OnInnerButtonMouseLeft;
+
+    UpdateBackground();
   }
 
   public static readonly DependencyProperty WindowProperty = RegisterProperty(x => x.Window);
@@ -43,7 +46,18 @@ public partial class TaskbarButton : UserControl
 
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
-    Win32.SwitchToThisWindow(Window.Handle, true);
+    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+    {
+      var si = Window.Process?.MainModule?.FileName;
+      if (si != null && si.ToLower().EndsWith(".exe"))
+      {
+        Process.Start(si);
+      }                   
+    }
+    else
+    {
+      Win32.SwitchToThisWindow(Window.RootHandle, true);
+    }
   }
 
   private void OnIsActiveChanged(bool oldValue, bool newValue)

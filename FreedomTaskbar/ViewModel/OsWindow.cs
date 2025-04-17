@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FreedomTaskbar.WpfExtensions;
+using System.Diagnostics;
 
 namespace FreedomTaskbar.ViewModel;
 
@@ -12,43 +13,42 @@ using static DependencyPropertyRegistrar<OsWindow>;
 
 public class OsWindow : DependencyObject
 {
-  public OsWindow(Win32Window w, IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles)
+  public OsWindow(Win32Window rootWindow, IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles)
   {
-    Handle = w.Handle;
+    RootHandle = rootWindow.Handle;
+    Process = Win32Utils.GetProcessForWindowHandle(RootHandle);
+
     Title = string.Empty;
     IsActive = false;
 
     RefreshInternal(foregroundWindowHandle, childWindowHandles, true);
   }
 
-  public static readonly DependencyProperty HandleProperty = RegisterProperty(x => x.Handle);
-  public IntPtr Handle
-  {
-    get => (IntPtr)GetValue(HandleProperty);
-    set => SetValue(HandleProperty, value);
-  }
+  public IntPtr RootHandle { get; }
+
+  public Process? Process { get; }
 
   public event Action<string, string>? TitleChanged;
-  public static readonly DependencyProperty TitleProperty = RegisterProperty(x => x.Title).OnChange(OnTitleChanged);
+  public static readonly DependencyPropertyKey TitleProperty = RegisterProperty(x => x.Title).OnChange(OnTitleChanged);
   public string Title
   {
-    get => (string)GetValue(TitleProperty);
-    set => SetValue(TitleProperty, value);
+    get => (string)GetValue(TitleProperty.DependencyProperty);
+    private set => SetValue(TitleProperty, value);
   }
 
-  public static readonly DependencyProperty IconProperty = RegisterProperty(x => x.Icon);
+  public static readonly DependencyPropertyKey IconProperty = RegisterProperty(x => x.Icon);
   public ImageSource Icon
   {
-    get => (ImageSource)GetValue(IconProperty);
-    set => SetValue(IconProperty, value);
+    get => (ImageSource)GetValue(IconProperty.DependencyProperty);
+    private set => SetValue(IconProperty, value);
   }
 
   public event Action<bool, bool>? IsActiveChanged;
-  public static readonly DependencyProperty IsActiveProperty = RegisterProperty(x => x.IsActive).OnChange(OnIsActiveChanged);
+  public static readonly DependencyPropertyKey IsActiveProperty = RegisterProperty(x => x.IsActive).OnChange(OnIsActiveChanged);
   public bool IsActive
   {
-    get => (bool)GetValue(IsActiveProperty);
-    set => SetValue(IsActiveProperty, value);
+    get => (bool)GetValue(IsActiveProperty.DependencyProperty);
+    private set => SetValue(IsActiveProperty, value);
   }
 
   public List<IntPtr> ChildWindows { get; } = new ();
@@ -62,7 +62,7 @@ public class OsWindow : DependencyObject
     RefreshInternal(foregroundWindowHandle, childWindowHandles, false);
   }
 
-  public void RefreshInternal(IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles, bool refreshIcon)
+  public void RefreshInternal(IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles, bool initStaticProperties)
   {
     RefreshTitle();
     RefreshIsActive(foregroundWindowHandle, childWindowHandles);
@@ -70,28 +70,28 @@ public class OsWindow : DependencyObject
     ChildWindows.Clear();
     ChildWindows.AddRange(childWindowHandles);
 
-    if (refreshIcon)
+    if (initStaticProperties)
     {
-      RefreshIcon();
+      InitIcon();
     }
   }
 
   private void RefreshTitle()
   {
-    var length = Win32.GetWindowTextLength(Handle);
+    var length = Win32.GetWindowTextLength(RootHandle);
     if (length == 0)
     {
       Title = string.Empty;
     }
 
     var builder = new StringBuilder(length);
-    Win32.GetWindowText(Handle, builder, length + 1);
+    Win32.GetWindowText(RootHandle, builder, length + 1);
     Title = builder.ToString();
   }
-
-  private void RefreshIcon()
+  
+  private void InitIcon()
   {
-    var exePath = Win32Utils.GetExecutablePathForWindow(Handle);
+    var exePath = Process?.MainModule?.FileName;
     if (exePath == null) return;
 
     var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);

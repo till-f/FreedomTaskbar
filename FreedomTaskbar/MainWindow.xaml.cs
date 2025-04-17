@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Timers;
 using System.Windows;
+using System.Windows.Input;
 using FreedomTaskbar.Controls;
 using FreedomTaskbar.Core;
 using FreedomTaskbar.ViewModel;
@@ -17,13 +18,13 @@ public partial class MainWindow : Window
 
   private readonly Timer _updateTimer;
 
-  private readonly List<string> _excludedWindows = ["Settings", "BBar", "Windows Input Experience", MainWindowTitle];
+  private readonly List<string> _excludedWindows = [/*"Settings", "BBar", "Windows Input Experience",*/ MainWindowTitle];
 
   public MainWindow()
   {
     InitializeComponent();
 
-    SetPosition();
+    MoveToSide(ESide.Right);
 
     RefreshWindowList();
 
@@ -38,15 +39,21 @@ public partial class MainWindow : Window
     Dispatcher.InvokeAsync(RefreshWindowList);
   }
 
-  private void SetPosition()
+  private const int TaskbarWidth = 200;
+
+  private void MoveToSide(ESide side)
   {
     int strangeWindowPaddingY = -16;
 
-    var width = 200;
     Top = 0;
-    Left = SystemParameters.PrimaryScreenWidth - width;
+    Left = side switch
+    {
+      ESide.Left => 0,
+      ESide.Right => SystemParameters.PrimaryScreenWidth - TaskbarWidth,
+      _ => 0
+    };
     Height = SystemParameters.MaximizedPrimaryScreenHeight + strangeWindowPaddingY;
-    Width = width;
+    Width = TaskbarWidth;
   }
 
   private void RefreshWindowList()
@@ -57,7 +64,7 @@ public partial class MainWindow : Window
 
     foreach (var taskBarButton in taskBarButtons)
     {
-      var newWindowsForExistingButton = newWindows.Where(it => it.RootHandle == taskBarButton.Window.Handle).ToList();
+      var newWindowsForExistingButton = newWindows.Where(it => it.RootHandle == taskBarButton.Window.RootHandle).ToList();
 
       if (newWindowsForExistingButton.Any())
       {
@@ -89,4 +96,21 @@ public partial class MainWindow : Window
       WindowsStackPanel.Children.Add(new TaskbarButton(osWindow));
     }
   }
+
+  private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
+  {
+    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+    {
+      if (e.Key == Key.Right)
+      {
+        MoveToSide(ESide.Right);
+      }
+      if (e.Key == Key.Left)
+      {
+        MoveToSide(ESide.Left);
+      }
+    }
+  }
+
+  private enum ESide { Left, Right }
 }

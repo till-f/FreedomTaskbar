@@ -8,7 +8,6 @@
              d:DesignHeight="40" d:DesignWidth="200"
              Name="ThisTaskbarButton">
   <Button x:Name="InnerButton"
-                   HorizontalContentAlignment="Left"
                    Margin="0, 0, 0, 1"
                    Foreground="White"
                    Background="{x:Static local:TaskbarButton.ColorInactive}"
@@ -20,7 +19,7 @@
             <ControlTemplate TargetType="{x:Type Button}">
               <!-- This is needed to get rid of the default highlighting color -->
               <Border Background="{TemplateBinding Background}">
-                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
               </Border>
             </ControlTemplate>
           </Setter.Value>
