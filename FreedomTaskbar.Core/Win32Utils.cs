@@ -33,17 +33,24 @@ public static class Win32Utils
         return true;
       }
 
-      var processId = GetProcessIdForWindowHandle(hWnd);
-      if (processId == null)
-      {
-        return true;
-      }
-
-      windows.Add(new Win32Window(hWnd, processId.Value));
+      windows.Add(new Win32Window(hWnd, GetRootWindow(hWnd)));
       return true;
     }, 0);
 
     return windows;
+  }
+
+  public static IntPtr GetRootWindow(IntPtr hWnd)
+  {
+    var parent = hWnd;
+
+    while (parent != 0)
+    {
+      hWnd = parent;
+      parent = Win32.GetWindow(hWnd, Win32.GW_OWNER);
+    }
+
+    return hWnd;
   }
 
   public static int? GetProcessIdForWindowHandle(IntPtr hWnd)

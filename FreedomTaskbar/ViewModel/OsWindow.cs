@@ -12,13 +12,13 @@ using static DependencyPropertyRegistrar<OsWindow>;
 
 public class OsWindow : DependencyObject
 {
-  public OsWindow(Win32Window w, IntPtr? foregroundWindowHandle = null)
+  public OsWindow(Win32Window w, IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles)
   {
     Handle = w.Handle;
     Title = string.Empty;
     IsActive = false;
 
-    RefreshInternal(foregroundWindowHandle, true);
+    RefreshInternal(foregroundWindowHandle, childWindowHandles, true);
   }
 
   public static readonly DependencyProperty HandleProperty = RegisterProperty(x => x.Handle);
@@ -51,20 +51,24 @@ public class OsWindow : DependencyObject
     set => SetValue(IsActiveProperty, value);
   }
 
+  public List<IntPtr> ChildWindows { get; } = new ();
+
   /// <summary>
   /// Queries the current state of the window from the OS and updates relevant properties.
   /// Note that <see cref="Icon"/> is not updated after initial construction.
   /// </summary>
-  /// <param name="foregroundWindowHandle"></param>
-  public void Refresh(IntPtr? foregroundWindowHandle = null)
+  public void Refresh(IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles)
   {
-    RefreshInternal(foregroundWindowHandle, false);
+    RefreshInternal(foregroundWindowHandle, childWindowHandles, false);
   }
 
-  public void RefreshInternal(IntPtr? foregroundWindowHandle, bool refreshIcon)
+  public void RefreshInternal(IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles, bool refreshIcon)
   {
     RefreshTitle();
-    RefreshIsActive(foregroundWindowHandle);
+    RefreshIsActive(foregroundWindowHandle, childWindowHandles);
+
+    ChildWindows.Clear();
+    ChildWindows.AddRange(childWindowHandles);
 
     if (refreshIcon)
     {
@@ -97,11 +101,9 @@ public class OsWindow : DependencyObject
     Icon = bitmapSource;
   }
 
-  private void RefreshIsActive(IntPtr? foregroundWindowHandle)
+  private void RefreshIsActive(IntPtr foregroundWindowHandle, IEnumerable<IntPtr> childWindowHandles)
   {
-    foregroundWindowHandle ??= Win32.GetForegroundWindow();
-
-    IsActive = Handle == foregroundWindowHandle;
+    IsActive = childWindowHandles.Contains(foregroundWindowHandle);
   }
 
   private static void OnTitleChanged(OsWindow sender, DependencyPropertyChangedEventArgs e)

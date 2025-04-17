@@ -51,6 +51,9 @@ public class Win32
   [DllImport("user32.dll")]
   public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
 
+  [DllImport("user32.dll")]
+  public static extern IntPtr GetWindow(IntPtr hwnd, uint uCmd);
+  
   /// <summary>
   /// Hides the window and activates another window.
   /// </summary>
@@ -110,6 +113,9 @@ public class Win32
   /// Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread.
   /// </summary>
   public const int SW_FORCEMINIMIZE = 11;
+
+
+  public const uint GW_OWNER = 4;
 
 
   [StructLayout(LayoutKind.Sequential)]
