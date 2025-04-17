@@ -8,7 +8,7 @@ using Expression = System.Linq.Expressions.Expression;
 
 #pragma warning disable CS8618, CS9264
 
-namespace FreedomTaskbar.ViewModel
+namespace FreedomTaskbar.FrameworkExtensions
 {
   public delegate void PropertyChangedCallback<TOwner>(TOwner sender, DependencyPropertyChangedEventArgs e) where TOwner : DependencyObject;
 
@@ -32,7 +32,7 @@ namespace FreedomTaskbar.ViewModel
 
       internal Property(string propertyName)
       {
-        this._propertyName = propertyName;
+        _propertyName = propertyName;
       }
 
       public Property<TValue> Default(TValue? value)
@@ -154,7 +154,7 @@ namespace FreedomTaskbar.ViewModel
         return this;
       }
 
-      public Property<TValue> CoerceObject(CoerceValueCallback<TOwner, Object> callback)
+      public Property<TValue> CoerceObject(CoerceValueCallback<TOwner, object> callback)
       {
         _coerceCallback = (sender, args) => callback((TOwner)sender, args);
 
@@ -197,8 +197,8 @@ namespace FreedomTaskbar.ViewModel
       private FrameworkPropertyMetadata CreateMetadata()
       {
         // Capture delegates
-        var changeCallback = this._changeCallback;
-        var coerceCallback = this._coerceCallback;
+        var changeCallback = _changeCallback;
+        var coerceCallback = _coerceCallback;
         var metadata = new FrameworkPropertyMetadata(Boxing.Box(_defaultValue), _propertyMetadataOptions);
 
         if (changeCallback != null)

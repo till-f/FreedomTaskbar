@@ -2,7 +2,7 @@
 using System.Timers;
 using System.Windows;
 using FreedomTaskbar.Controls;
-using FreedomTaskbar.ViewModel;
+using FreedomTaskbar.FrameworkExtensions;
 using Timer = System.Timers.Timer;
 
 namespace FreedomTaskbar;
@@ -57,7 +57,7 @@ public partial class MainWindow : Window
         continue;
       }
 
-      WindowsStackPanel.Children.Add(new WindowButton(window));
+      WindowsStackPanel.Children.Add(new TaskbarButton(window));
     }
   }
 }

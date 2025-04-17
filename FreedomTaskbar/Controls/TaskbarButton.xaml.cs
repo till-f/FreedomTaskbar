@@ -1,18 +1,19 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using FreedomTaskbar.Core;
+using FreedomTaskbar.FrameworkExtensions;
 using FreedomTaskbar.ViewModel;
 
 namespace FreedomTaskbar.Controls;
 
-using static DependencyPropertyRegistrar<WindowButton>;
+using static DependencyPropertyRegistrar<TaskbarButton>;
 
 /// <summary>
 /// Interaction logic for TaskButton.xaml
 /// </summary>
-public partial class WindowButton : UserControl
+public partial class TaskbarButton : UserControl
 {
-  public WindowButton(OsWindow osWindow)
+  public TaskbarButton(OsWindow osWindow)
   {
     InitializeComponent();
 

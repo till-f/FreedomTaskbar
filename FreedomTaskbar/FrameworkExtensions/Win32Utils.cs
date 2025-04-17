@@ -1,6 +1,7 @@
 ﻿using FreedomTaskbar.Core;
+using FreedomTaskbar.ViewModel;
 
-namespace FreedomTaskbar.ViewModel;
+namespace FreedomTaskbar.FrameworkExtensions;
 
 public static class Win32Utils
 {
@@ -11,11 +12,11 @@ public static class Win32Utils
 
     List<OsWindow> windows = [];
 
-    Win32.EnumWindows(delegate (IntPtr hWnd, int _)
+    Win32.EnumWindows(delegate (nint hWnd, int _)
     {
       if (hWnd == shellWindow)
       {
-         return true;
+        return true;
       }
 
       if (!Win32.IsWindowVisible(hWnd))

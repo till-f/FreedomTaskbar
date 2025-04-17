@@ -9,8 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FreedomTaskbar.Core\FreedomTaskbar.Core.csproj" />
-    <ProjectReference Include="..\FreedomTaskbar.ViewModel\FreedomTaskbar.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using FreedomTaskbar.Core;
+using FreedomTaskbar.FrameworkExtensions;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
