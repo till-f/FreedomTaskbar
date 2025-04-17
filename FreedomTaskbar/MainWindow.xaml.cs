@@ -37,7 +37,7 @@ public partial class MainWindow : Window
 
   private void SetPosition()
   {
-    var width = 300;
+    var width = 200;
     Top = 0;
     Left = SystemParameters.PrimaryScreenWidth - width;
     Height = SystemParameters.MaximizedPrimaryScreenHeight;

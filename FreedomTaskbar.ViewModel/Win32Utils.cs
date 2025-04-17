@@ -1,16 +1,15 @@
-﻿using System.Text;
-using FreedomTaskbar.Core;
+﻿using FreedomTaskbar.Core;
 
 namespace FreedomTaskbar.ViewModel;
 
 public static class Win32Utils
 {
-  public static List<Win32Window> GetOpenWindows()
+  public static List<OsWindow> GetOpenWindows()
   {
     var shellWindow = Win32.GetShellWindow();
     var foregroundWindow = Win32.GetForegroundWindow();
 
-    List<Win32Window> windows = [];
+    List<OsWindow> windows = [];
 
     Win32.EnumWindows(delegate (IntPtr hWnd, int _)
     {
@@ -30,7 +29,7 @@ public static class Win32Utils
         return true;
       }
 
-      windows.Add(new Win32Window(hWnd, hWnd == foregroundWindow));
+      windows.Add(new OsWindow(hWnd, hWnd == foregroundWindow));
       return true;
     }, 0);
 

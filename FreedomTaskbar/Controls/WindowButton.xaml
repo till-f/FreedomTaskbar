@@ -13,14 +13,18 @@
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <Image Source="{Binding ElementName=ThisWindowButton, Path=Win32Window.Icon}"
+      <Image Source="{Binding ElementName=ThisWindowButton, Path=OsWindow.Icon}"
              Grid.Column="0" />
-      <TextBlock Text="{Binding ElementName=ThisWindowButton, Path=Win32Window.Title}"
+      <TextBlock Text="{Binding ElementName=ThisWindowButton, Path=OsWindow.Title}"
+                 Padding="5"
+                 FontSize="14"
                  TextTrimming="CharacterEllipsis"
                  Grid.Column="1" />
-      <!-- <TextBlock Text="Hello World Button! This is very long Text" -->
-      <!--            TextTrimming="CharacterEllipsis" -->
-      <!--            Grid.Column="1" /> -->
+      <TextBlock Text="Hello World Button! This is very long Text"
+                 Padding="5"
+                 FontSize="14"
+                 TextTrimming="CharacterEllipsis"
+                 Grid.Column="1" />
     </Grid>
   </Button>
 </UserControl>

@@ -5,17 +5,19 @@ using System.Windows.Media;
 
 namespace FreedomTaskbar.ViewModel;
 
-using static DependencyPropertyRegistrar<Win32Window>;
+using static DependencyPropertyRegistrar<OsWindow>;
 
-public class Win32Window : DependencyObject
+public class OsWindow : DependencyObject
 {
-  public Win32Window(IntPtr handle, bool isForegroundWindow = false)
+  public OsWindow(IntPtr handle, bool isForegroundWindow = false)
   {
     Title = string.Empty;
     Handle = handle;
     IsForegroundWindow = isForegroundWindow;
 
     RefreshTitle();
+
+    var icon = System.Drawing.Icon.ExtractAssociatedIcon();
   }
   
   public static readonly DependencyProperty HandleProperty = RegisterProperty(x => x.Handle);

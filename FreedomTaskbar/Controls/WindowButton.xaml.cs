@@ -12,24 +12,24 @@ using static DependencyPropertyRegistrar<WindowButton>;
 /// </summary>
 public partial class WindowButton : UserControl
 {
-  public WindowButton(Win32Window win32Window)
+  public WindowButton(OsWindow osWindow)
   {
     InitializeComponent();
 
-    Win32Window = win32Window;
+    OsWindow = osWindow;
 
     InnerButton.Click += OnInnerButtonClicked;
   }
 
-  public static readonly DependencyProperty Win32WindowProperty = RegisterProperty(x => x.Win32Window);
-  public Win32Window Win32Window
+  public static readonly DependencyProperty OsWindowProperty = RegisterProperty(x => x.OsWindow);
+  public OsWindow OsWindow
   {
-    get => (Win32Window)GetValue(Win32WindowProperty);
-    set => SetValue(Win32WindowProperty, value);
+    get => (OsWindow)GetValue(OsWindowProperty);
+    set => SetValue(OsWindowProperty, value);
   }
 
   private void OnInnerButtonClicked(object sender, RoutedEventArgs e)
   {
-    Win32.SwitchToThisWindow(Win32Window.Handle, true);
+    Win32.SwitchToThisWindow(OsWindow.Handle, true);
   }
 }
