@@ -105,8 +105,8 @@ public class OsWindow : DependencyObject
     catch
     {
       // Win32Exception: "Access is denied." may be thrown when MainModule cannot be accessed for
-      // system process. Should never happen because respective windows should already be filtered out
-      // before OsWindow instance is created. Anyway, ignore the exception.
+      // elevated process. This can only be avoided by running FreedomTaskbar as administrator.
+      Debug.WriteLine($"Failed to extract icon for window '{Title}'");
     }
   }
 
