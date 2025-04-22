@@ -6,14 +6,12 @@ public static class Win32Utils
 {
   public static List<Win32Window> GetOpenWindows()
   {
-    var shellWindow = Win32.GetShellWindow();
-
     List<Win32Window> windows = [];
 
     Win32.EnumWindows(delegate (nint hWnd, int _)
     {
       var rootWindowHandle = GetRootWindow(hWnd);
-      if (hWnd == rootWindowHandle && !IsApplicableForRootWindow(hWnd, shellWindow))
+      if (hWnd == rootWindowHandle && !IsApplicableForRootWindow(hWnd))
       {
         return true;
       }
@@ -67,13 +65,9 @@ public static class Win32Utils
     }
   }
 
-  public static bool IsApplicableForRootWindow(IntPtr hWnd, IntPtr shellWindow)
+  public static bool IsApplicableForRootWindow(IntPtr hWnd)
   {
-    if (hWnd == shellWindow)
-    {
-      return false;
-    }
-
+    // Always skip invisible windows
     if (!Win32.IsWindowVisible(hWnd))
     {
       return false;
@@ -81,17 +75,12 @@ public static class Win32Utils
 
     Win32.WINDOWINFO wi = new ();
     Win32.GetWindowInfo(hWnd, ref wi);
-    
-    // Skip Invisible, Popup or Child windows
-    if ((wi.dwStyle & Win32.WS_VISIBLE) == 0L
-        || (wi.dwStyle & Win32.WS_POPUP) != 0L
-        || (wi.dwStyle & Win32.WS_CHILD) != 0L)
-    {
-      return false;
-    }
 
-    // Skip ToolWindow and NoActive windows, if not explicitly marked as AppWindow
-    return (wi.dwExStyle & Win32.WS_EX_APPWINDOW) != 0L
-           || ((wi.dwExStyle & Win32.WS_EX_TOOLWINDOW) == 0L && (wi.dwExStyle & Win32.WS_EX_NOACTIVATE) == 0L);
+    // Skip Popup, Child, Tool and NoActive windows, if not explicitly marked as AppWindow
+    return (wi.dwExStyle & Win32.WS_EX_APPWINDOW) != 0L ||
+           ((wi.dwStyle & Win32.WS_POPUP) == 0L
+            && (wi.dwStyle & Win32.WS_CHILD) == 0L
+            && (wi.dwExStyle & Win32.WS_EX_TOOLWINDOW) == 0L
+            && (wi.dwExStyle & Win32.WS_EX_NOACTIVATE) == 0L);
   }
 }

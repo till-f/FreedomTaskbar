@@ -91,14 +91,23 @@ public class OsWindow : DependencyObject
   
   private void InitIcon()
   {
-    var exePath = Process?.MainModule?.FileName;
-    if (exePath == null) return;
+    try
+    {
+      var exePath = Process?.MainModule?.FileName;
+      if (exePath == null) return;
 
-    var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
-    if (icon == null) return;
+      var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+      if (icon == null) return;
 
-    var bitmapSource = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-    Icon = bitmapSource;
+      var bitmapSource = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+      Icon = bitmapSource;
+    }
+    catch
+    {
+      // Win32Exception: "Access is denied." may be thrown when MainModule cannot be accessed for
+      // system process. Should never happen because respective windows should already be filtered out
+      // before OsWindow instance is created. Anyway, ignore the exception.
+    }
   }
 
   private void RefreshIsActive(IntPtr foregroundWindowHandle, IEnumerable<IntPtr> childWindowHandles)
