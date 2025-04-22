@@ -127,7 +127,29 @@ public partial class MainWindow : Window
     e.Cancel = true;
   }
 
-  private enum ESide { Left, Right }
+
+  private void MainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+  {
+    if (e.OriginalSource == this && e.ChangedButton == MouseButton.Right)
+    {
+      MainContextMenu.IsOpen = true;
+    }
+  }
+
+  private void MenuItemToLeft_OnClick(object sender, RoutedEventArgs e)
+  {
+    MoveToSide(ESide.Left);
+  }
+
+  private void MenuItemToRight_OnClick(object sender, RoutedEventArgs e)
+  {
+    MoveToSide(ESide.Right);
+  }
+
+  private void MenuItemExit_OnClick(object sender, RoutedEventArgs e)
+  {
+    Application.Current.Shutdown();
+  }
 
   /// <summary>
   /// This hides the application from the Alt+Tab menu.
@@ -157,3 +179,5 @@ public partial class MainWindow : Window
     }
   }
 }
+
+enum ESide { Left, Right }

@@ -62,6 +62,34 @@ public class OsWindow : DependencyObject
     RefreshInternal(foregroundWindowHandle, childWindowHandles, false);
   }
 
+  public void Close()
+  {
+    Win32.PostMessage(RootHandle, Win32.WM_CLOSE, 0, 0);
+  }
+
+  public void KillProcess()
+  {
+    var title = Title;
+    var process = Process;
+    if (process == null)
+    {
+      return;
+    }
+
+    Task.Run(() =>
+    {
+      try
+      {
+        process.Kill();
+      }
+      catch
+      {
+        Debug.WriteLine($"Failed to kill process for window '{title}'");
+      }
+    });
+
+  }
+
   public void RefreshInternal(IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles, bool initStaticProperties)
   {
     RefreshTitle();

@@ -1,14 +1,27 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 
-namespace WpfApp1
-{
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-    }
+namespace FreedomTaskbar;
 
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
+{
+  private void App_OnStartup(object sender, StartupEventArgs e)
+  {
+    EnsureNotRunning();
+  }
+
+  private void EnsureNotRunning()
+  {
+    var alreadyRunning = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location)).Length > 1;
+    if (alreadyRunning)
+    {
+      Debug.WriteLine("Another instance is already running.");
+      Shutdown(1);
+    }
+  }
 }

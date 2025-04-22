@@ -27,6 +27,14 @@
       </Style>
     </Button.Style>
 
+    <Button.ContextMenu>
+      <ContextMenu>
+        <MenuItem Header="Close" Click="MenuItemClose_OnClick"/>
+        <Separator/>
+        <MenuItem Header="Kill" Click="MenuItemKill_OnClick"/>
+      </ContextMenu>
+    </Button.ContextMenu>
+
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />

@@ -14,10 +14,21 @@
         Loaded="MainWindow_OnLoaded"
         KeyUp="MainWindow_OnKeyUp"
         Closing="MainWindow_OnClosing"
+        MouseRightButtonUp="MainWindow_OnMouseRightButtonUp"
         d:DesignWidth="300"
         d:DesignHeight="600">
-    <Grid>
-      <StackPanel Name="WindowsStackPanel" 
-                  Orientation="Vertical"/>
-    </Grid>
+
+  <Window.ContextMenu>
+    <ContextMenu Name="MainContextMenu">
+      <MenuItem Header="To Left" Click="MenuItemToLeft_OnClick"/>
+      <MenuItem Header="To Right" Click="MenuItemToRight_OnClick"/>
+      <Separator/>
+      <MenuItem Header="Exit" Click="MenuItemExit_OnClick"/>
+    </ContextMenu>
+  </Window.ContextMenu>
+
+  <Grid>
+    <StackPanel Name="WindowsStackPanel" 
+                Orientation="Vertical" />
+  </Grid>
 </Window>

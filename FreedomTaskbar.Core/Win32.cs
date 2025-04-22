@@ -52,11 +52,14 @@ public class Win32
   public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
   [DllImport("user32.dll")]
-  public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
+  public static extern bool GetWindowInfo(IntPtr hWnd, ref WINDOWINFO pwi);
 
   [DllImport("user32.dll")]
-  public static extern IntPtr GetWindow(IntPtr hwnd, uint uCmd);
-  
+  public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+  [DllImport("user32.dll")]
+  public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
   public const int SW_HIDE = 0;
   public const int SW_SHOWNORMAL = 1;
   public const int SW_SHOWMINIMIZED = 2;
@@ -72,6 +75,8 @@ public class Win32
 
 
   public const uint GW_OWNER = 4;
+
+  public const uint WM_CLOSE = 0x0010;
 
   public const ulong WS_POPUP = 0x80000000L;
   public const ulong WS_CHILD = 0x40000000L;

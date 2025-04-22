@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -87,5 +86,15 @@ public partial class TaskbarButton : UserControl
     {
       InnerButton.Background = isHovered ? ColorInactiveHover : ColorInactive;
     }
+  }
+
+  private void MenuItemClose_OnClick(object sender, RoutedEventArgs e)
+  {
+    Window.Close();
+  }
+  
+  private void MenuItemKill_OnClick(object sender, RoutedEventArgs e)
+  {
+    Window.KillProcess();
   }
 }
