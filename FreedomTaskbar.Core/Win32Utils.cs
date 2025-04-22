@@ -12,11 +12,6 @@ public static class Win32Utils
 
     Win32.EnumWindows(delegate (nint hWnd, int _)
     {
-      // if (!Win32.IsWindowVisible(hWnd))
-      // {
-      //   return true;
-      // }
-
       var rootWindowHandle = GetRootWindow(hWnd);
       if (hWnd == rootWindowHandle && !IsApplicableForRootWindow(hWnd, shellWindow))
       {
@@ -75,6 +70,11 @@ public static class Win32Utils
   public static bool IsApplicableForRootWindow(IntPtr hWnd, IntPtr shellWindow)
   {
     if (hWnd == shellWindow)
+    {
+      return false;
+    }
+
+    if (!Win32.IsWindowVisible(hWnd))
     {
       return false;
     }

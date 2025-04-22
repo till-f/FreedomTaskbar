@@ -66,18 +66,16 @@ public partial class MainWindow : Window
     {
       var newWindowsForExistingButton = newWindows.Where(it => it.RootHandle == taskBarButton.Window.RootHandle).ToList();
 
-      if (newWindowsForExistingButton.Any())
+      if (newWindowsForExistingButton.Any(it => it.IsRootWindow))
       {
+        // root window already has a taskbar button => refresh it and skip respective windows (remove from list)
         var childWindowHandles = newWindowsForExistingButton.Select(it => it.Handle).ToList();
-
-        // button already exists => refresh and skip respective windows (remove from list)
-        // skip windows that already have taskbar button
         newWindows.RemoveAll(it => newWindowsForExistingButton.Contains(it));
         taskBarButton.Window.Refresh(foregroundWindow, childWindowHandles);
       }
       else
       {
-        // window for the taskbar button does not exist anymore => remove the button
+        // root window for the taskbar button does not exist anymore => remove the button
         WindowsStackPanel.Children.Remove(taskBarButton);
       }
     }
