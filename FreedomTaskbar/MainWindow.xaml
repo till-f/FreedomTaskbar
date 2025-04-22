@@ -11,7 +11,9 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="#1C1C1C"
+        Loaded="MainWindow_OnLoaded"
         KeyUp="MainWindow_OnKeyUp"
+        Closing="MainWindow_OnClosing"
         d:DesignWidth="300"
         d:DesignHeight="600">
     <Grid>

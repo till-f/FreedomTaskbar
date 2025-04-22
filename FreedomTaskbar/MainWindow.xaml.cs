@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -95,9 +98,17 @@ public partial class MainWindow : Window
     }
   }
 
+  private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+  {
+    HideFromAltTabMenu();
+  }
+
   private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
   {
-    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+    if (Keyboard.IsKeyDown(Key.LeftShift) 
+        || Keyboard.IsKeyDown(Key.RightShift)
+        || Keyboard.IsKeyDown(Key.LeftCtrl) 
+        || Keyboard.IsKeyDown(Key.RightCtrl))
     {
       if (e.Key == Key.Right)
       {
@@ -110,5 +121,39 @@ public partial class MainWindow : Window
     }
   }
 
+  private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+  {
+    // prevents closing window with Alt+F4 etc.
+    e.Cancel = true;
+  }
+
   private enum ESide { Left, Right }
+
+  /// <summary>
+  /// This hides the application from the Alt+Tab menu.
+  /// It sets the "ToolWindow" flag without adding a caption etc. (keeping WindowStyle 'None').
+  /// See https://www.csharp411.com/hide-form-from-alttab/ (Link is for WinForms, WPF requires the hack below).
+  /// </summary>
+  private void HideFromAltTabMenu()
+  {
+    try
+    {
+      var hWnd = Process.GetCurrentProcess().MainWindowHandle;
+      Win32.WINDOWINFO wi = new();
+      Win32.GetWindowInfo(hWnd, ref wi);
+
+      var t = typeof(Window).GetNestedType("HwndStyleManager", BindingFlags.NonPublic);
+      var m = t!.GetMethod("StartManaging", BindingFlags.Static | BindingFlags.NonPublic, [typeof(Window), typeof(int), typeof(int)]);
+      using (var _ = (IDisposable)m!.Invoke(null, [this, (int)wi.dwStyle, (int)wi.dwExStyle])!)
+      {
+        var styleExProperty = typeof(Window).GetProperty("_StyleEx", BindingFlags.Instance | BindingFlags.NonPublic);
+        var newStyleEx = (int)(wi.dwExStyle | 0x80);
+        styleExProperty!.SetValue(this, newStyleEx);
+      }
+    }
+    catch
+    {
+      Debug.WriteLine("Hack to hide FreedomTaskbar from Alt+Tab menu failed. The .NET codebase may have changed.");
+    }
+  }
 }
