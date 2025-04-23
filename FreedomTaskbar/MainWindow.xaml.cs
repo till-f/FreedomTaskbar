@@ -19,30 +19,89 @@ public partial class MainWindow : Window
 {
   public const string MainWindowTitle = "Freedom Taskbar";
 
-  private readonly Timer _updateTimer;
+  private const int TaskbarWidth = 200;
 
-  private readonly List<string> _excludedWindows = [/*"Settings", "BBar", "Windows Input Experience",*/ MainWindowTitle];
+  private readonly Timer _refreshTimer = new (200);
+  private readonly List<string> _excludedWindows = [];
 
   public MainWindow()
   {
     InitializeComponent();
-
-    MoveToSide(ESide.Right);
-
-    RefreshWindowList();
-
-    _updateTimer = new Timer(200);
-    _updateTimer.AutoReset = true;
-    _updateTimer.Elapsed += OnUpdateTimeElapsed;
-    _updateTimer.Start();
   }
 
-  private void OnUpdateTimeElapsed(object? sender, ElapsedEventArgs e)
+  private IEnumerable<TaskbarButton> TaskbarButtons => WindowsStackPanel.Children.OfType<TaskbarButton>();
+
+  private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+  {
+    HideFromAltTabMenu();
+    MoveToSide(ESide.Right);
+    RefreshWindowList();
+
+    _refreshTimer.AutoReset = true;
+    _refreshTimer.Elapsed -= RefreshTimer_OnElapsed;
+    _refreshTimer.Elapsed += RefreshTimer_OnElapsed;
+    _refreshTimer.Start();
+  }
+
+  private void RefreshTimer_OnElapsed(object? sender, ElapsedEventArgs e)
   {
     Dispatcher.InvokeAsync(RefreshWindowList);
   }
 
-  private const int TaskbarWidth = 200;
+  private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
+  {
+    if (Keyboard.IsKeyDown(Key.LeftShift) 
+        || Keyboard.IsKeyDown(Key.RightShift)
+        || Keyboard.IsKeyDown(Key.LeftCtrl) 
+        || Keyboard.IsKeyDown(Key.RightCtrl))
+    {
+      switch (e.Key)
+      {
+        case Key.Right:
+          MoveToSide(ESide.Right);
+          break;
+        case Key.Left:
+          MoveToSide(ESide.Left);
+          break;
+        case Key.Up:
+          MoveButton(-1);
+          break;
+        case Key.Down:
+          MoveButton(+1);
+          break;
+      }
+
+    }
+  }
+
+  private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+  {
+    // prevents closing window with Alt+F4 etc.
+    e.Cancel = true;
+  }
+
+  private void MainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+  {
+    if (e.OriginalSource == this && e.ChangedButton == MouseButton.Right)
+    {
+      MainContextMenu.IsOpen = true;
+    }
+  }
+
+  private void MenuItemToLeft_OnClick(object sender, RoutedEventArgs e)
+  {
+    MoveToSide(ESide.Left);
+  }
+
+  private void MenuItemToRight_OnClick(object sender, RoutedEventArgs e)
+  {
+    MoveToSide(ESide.Right);
+  }
+
+  private void MenuItemExit_OnClick(object sender, RoutedEventArgs e)
+  {
+    Application.Current.Shutdown();
+  }
 
   private void MoveToSide(ESide side)
   {
@@ -63,9 +122,8 @@ public partial class MainWindow : Window
   {
     var foregroundWindow = Win32.GetForegroundWindow();
     var newWindows = Win32Utils.GetOpenWindows().ToList();
-    var taskBarButtons = WindowsStackPanel.Children.OfType<TaskbarButton>().ToList();
 
-    foreach (var taskBarButton in taskBarButtons)
+    foreach (var taskBarButton in TaskbarButtons.ToList())
     {
       var newWindowsForExistingButton = newWindows.Where(it => it.RootHandle == taskBarButton.Window.RootHandle).ToList();
 
@@ -98,59 +156,6 @@ public partial class MainWindow : Window
     }
   }
 
-  private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-  {
-    HideFromAltTabMenu();
-  }
-
-  private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
-  {
-    if (Keyboard.IsKeyDown(Key.LeftShift) 
-        || Keyboard.IsKeyDown(Key.RightShift)
-        || Keyboard.IsKeyDown(Key.LeftCtrl) 
-        || Keyboard.IsKeyDown(Key.RightCtrl))
-    {
-      if (e.Key == Key.Right)
-      {
-        MoveToSide(ESide.Right);
-      }
-      if (e.Key == Key.Left)
-      {
-        MoveToSide(ESide.Left);
-      }
-    }
-  }
-
-  private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
-  {
-    // prevents closing window with Alt+F4 etc.
-    e.Cancel = true;
-  }
-
-
-  private void MainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-  {
-    if (e.OriginalSource == this && e.ChangedButton == MouseButton.Right)
-    {
-      MainContextMenu.IsOpen = true;
-    }
-  }
-
-  private void MenuItemToLeft_OnClick(object sender, RoutedEventArgs e)
-  {
-    MoveToSide(ESide.Left);
-  }
-
-  private void MenuItemToRight_OnClick(object sender, RoutedEventArgs e)
-  {
-    MoveToSide(ESide.Right);
-  }
-
-  private void MenuItemExit_OnClick(object sender, RoutedEventArgs e)
-  {
-    Application.Current.Shutdown();
-  }
-
   /// <summary>
   /// This hides the application from the Alt+Tab menu.
   /// It sets the "ToolWindow" flag without adding a caption etc. (keeping WindowStyle 'None').
@@ -177,6 +182,31 @@ public partial class MainWindow : Window
     {
       Debug.WriteLine("Hack to hide FreedomTaskbar from Alt+Tab menu failed. The .NET codebase may have changed.");
     }
+  }
+
+  private void MoveButton(int delta)
+  {
+    var allButtons = TaskbarButtons.ToList();
+    var activeWindow = TaskbarButtons.FirstOrDefault(it => it.Window.IsActive);
+    if (activeWindow == null)
+    {
+      return;
+    }
+
+    var oldIdx = allButtons.IndexOf(activeWindow);
+    if (oldIdx < 0)
+    {
+      return;
+    }
+
+    var newIdx = oldIdx + delta;
+    if (newIdx < 0 || newIdx > allButtons.Count - 1)
+    {
+      return;
+    }
+
+    //WindowsStackPanel.Children.Remove(activeWindow);
+    WindowsStackPanel.Children.Insert(allButtons.IndexOf(activeWindow), activeWindow);
   }
 }
 
