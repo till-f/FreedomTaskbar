@@ -28,7 +28,7 @@
   </Window.ContextMenu>
 
   <Grid>
-    <StackPanel Name="WindowsStackPanel" 
+    <StackPanel Name="TaskbarButtonsStackPanel" 
                 Orientation="Vertical" />
   </Grid>
 </Window>

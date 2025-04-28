@@ -29,7 +29,7 @@ public partial class MainWindow : Window
     InitializeComponent();
   }
 
-  private IEnumerable<TaskbarButton> TaskbarButtons => WindowsStackPanel.Children.OfType<TaskbarButton>();
+  private IEnumerable<TaskbarButton> TaskbarButtons => TaskbarButtonsStackPanel.Children.OfType<TaskbarButton>();
 
   private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
   {
@@ -62,12 +62,6 @@ public partial class MainWindow : Window
           break;
         case Key.Left:
           MoveToSide(ESide.Left);
-          break;
-        case Key.Up:
-          MoveButton(-1);
-          break;
-        case Key.Down:
-          MoveButton(+1);
           break;
       }
 
@@ -137,7 +131,8 @@ public partial class MainWindow : Window
       else
       {
         // root window for the taskbar button does not exist anymore => remove the button
-        WindowsStackPanel.Children.Remove(taskBarButton);
+        TaskbarButtonsStackPanel.Children.Remove(taskBarButton);
+        taskBarButton.WindowHandleDropped -= OnWindowHandleDropped;
       }
     }
 
@@ -152,7 +147,9 @@ public partial class MainWindow : Window
         continue;
       }
 
-      WindowsStackPanel.Children.Add(new TaskbarButton(osWindow));
+      var tbb = new TaskbarButton(osWindow);
+      tbb.WindowHandleDropped += OnWindowHandleDropped;
+      TaskbarButtonsStackPanel.Children.Add(tbb);
     }
   }
 
@@ -184,29 +181,21 @@ public partial class MainWindow : Window
     }
   }
 
-  private void MoveButton(int delta)
+  /// <summary>
+  /// Moves the taskbar button for dropped window handle.
+  /// If button was dragged down, it is inserted behind the drop target, otherwise it is inserted before.
+  /// </summary>
+  private void OnWindowHandleDropped((TaskbarButton TargetButton, string DroppedWindowHandle) e)
   {
-    var allButtons = TaskbarButtons.ToList();
-    var activeWindow = TaskbarButtons.FirstOrDefault(it => it.Window.IsActive);
-    if (activeWindow == null)
-    {
-      return;
-    }
+    // move taskbar button for dropped window handle
+    // if moved down, insert it behind (otherwise, it is inserted before)
 
-    var oldIdx = allButtons.IndexOf(activeWindow);
-    if (oldIdx < 0)
-    {
-      return;
-    }
+    var sourceButton = TaskbarButtons.First(it => it.Window.RootHandle.ToString() == e.DroppedWindowHandle);
+    var oldIdx = TaskbarButtonsStackPanel.Children.IndexOf(sourceButton);
+    var newIdx = TaskbarButtonsStackPanel.Children.IndexOf(e.TargetButton);
 
-    var newIdx = oldIdx + delta;
-    if (newIdx < 0 || newIdx > allButtons.Count - 1)
-    {
-      return;
-    }
-
-    //WindowsStackPanel.Children.Remove(activeWindow);
-    WindowsStackPanel.Children.Insert(allButtons.IndexOf(activeWindow), activeWindow);
+    TaskbarButtonsStackPanel.Children.Remove(sourceButton);
+    TaskbarButtonsStackPanel.Children.Insert(newIdx, sourceButton);
   }
 }
 
