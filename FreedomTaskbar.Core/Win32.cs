@@ -58,6 +58,15 @@ public class Win32
   public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
   [DllImport("user32.dll")]
+  public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+  [DllImport("user32.dll")]
+  public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
+  [DllImport("user32.dll")]
+  public static extern IntPtr AdjustWindowRectExForDpi(ref RECT hWnd, uint dwStyle, bool bMenu, uint dwExStyle, uint dpi);
+
+  [DllImport("user32.dll")]
   public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
   /// <summary>
@@ -97,6 +106,8 @@ public class Win32
   public const ulong WS_EX_APPWINDOW = 0x00040000L;
   public const ulong WS_EX_TOOLWINDOW = 0x00000080L;
   public const ulong WS_EX_NOACTIVATE = 0x08000000L;
+
+  public const int SWP_NOZORDER = 0x0004;
 
   [StructLayout(LayoutKind.Sequential)]
   public struct WINDOWINFO

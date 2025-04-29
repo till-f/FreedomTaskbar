@@ -17,9 +17,10 @@ namespace FreedomTaskbar;
 /// </summary>
 public partial class MainWindow : Window
 {
-  public const string MainWindowTitle = "Freedom Taskbar";
+  public static ESide TaskbarSide { get; private set; } = ESide.Right;
 
-  private const int TaskbarWidth = 200;
+  public const string MainWindowTitle = "Freedom Taskbar";
+  public const int TaskbarWidth = 200;
 
   private readonly Timer _refreshTimer = new (200);
   private readonly List<string> _excludedWindows = [];
@@ -99,6 +100,9 @@ public partial class MainWindow : Window
 
   private void MoveToSide(ESide side)
   {
+    TaskbarSide = side;
+
+    // TODO: use Win32 API somehow to get rid of this hard-coded value
     int strangeWindowPaddingY = -16;
 
     Top = 0;
@@ -198,4 +202,4 @@ public partial class MainWindow : Window
   }
 }
 
-enum ESide { Left, Right }
+public enum ESide { Left, Right }

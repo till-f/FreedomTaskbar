@@ -13,6 +13,8 @@ using static DependencyPropertyRegistrar<OsWindow>;
 
 public class OsWindow : DependencyObject
 {
+  private Win32.RECT? _posRestore;
+
   public OsWindow(Win32Window rootWindow, IntPtr foregroundWindowHandle, IList<IntPtr> childWindowHandles)
   {
     RootHandle = rootWindow.Handle;
@@ -146,7 +148,51 @@ public class OsWindow : DependencyObject
     var isMaximized = Win32.IsZoomed(RootHandle);
     if (!isMaximized) return;
 
-    // TODO
+    var pos = Win32Utils.GetWindowClientRect(RootHandle);
+    if (pos.X < -40 || pos.X > 40 || pos.Y < -40 || pos.Y > 40)
+    {
+      // skip if window is maximized on a different screen than primary screen
+      // (primary screen always has (0,0) as top-left coordinate)
+      // also forget restore position (so that pseudo-maximisation is used next time on primary monitor)
+      _posRestore = null;
+      return;
+    }
+
+    // restore to previous size (not maximized)
+    Win32.ShowWindow(RootHandle, Win32.SW_RESTORE);
+
+    Win32.RECT newPos;
+    if (_posRestore == null)
+    {
+      // no position is remembered; calculate position for pseudo-maximized window and remember previous size
+      int width = (int)SystemParameters.MaximizedPrimaryScreenWidth - MainWindow.TaskbarWidth;
+      int height = (int)SystemParameters.MaximizedPrimaryScreenHeight;
+      int x =  MainWindow.TaskbarSide == ESide.Right ? 0 : MainWindow.TaskbarWidth;
+      int y = 0;
+
+      // Apply adjustment for Windows' weird border/offset around windows
+      // TODO: consider to use this method instead of manually picked values:
+      // Win32.AdjustWindowRectExForDpi(ref posMaximized, wi.dwStyle, false, wi.dwExStyle, 96);
+      y += 5;
+      width -= 16;
+      height -= 26;
+      newPos = new Win32.RECT(x, y, x + width, y + height);
+
+      Win32.GetWindowRect(RootHandle, out Win32.RECT wRect);
+      _posRestore = wRect;
+    }
+    else
+    {
+      // a position is remembered; restore it
+      newPos = _posRestore.Value;
+      _posRestore = null;
+    }
+
+    // if Top/Left is below zero, the behavior of SetWindowPos is unexpected...
+    var newX = newPos.Left < 0 ? 0 : newPos.Left;
+    var newY = newPos.Top < 0 ? 0 : newPos.Top;
+
+    Win32.SetWindowPos(RootHandle, 0, newX, newY, newPos.Width, newPos.Height, Win32.SWP_NOZORDER);
   }
 
   private void RefreshIsActive(IntPtr foregroundWindowHandle, IEnumerable<IntPtr> childWindowHandles)

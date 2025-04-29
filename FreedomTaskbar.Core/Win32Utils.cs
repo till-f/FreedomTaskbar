@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 
 namespace FreedomTaskbar.Core;
 
@@ -82,5 +83,12 @@ public static class Win32Utils
             && (wi.dwStyle & Win32.WS_CHILD) == 0L
             && (wi.dwExStyle & Win32.WS_EX_TOOLWINDOW) == 0L
             && (wi.dwExStyle & Win32.WS_EX_NOACTIVATE) == 0L);
+  }
+
+  public static Win32.RECT GetWindowClientRect(IntPtr hWnd)
+  {
+    Win32.WINDOWINFO wi = new();
+    Win32.GetWindowInfo(hWnd, ref wi);
+    return wi.rcClient;
   }
 }
