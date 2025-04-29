@@ -102,6 +102,9 @@ public class OsWindow : DependencyObject
     {
       InitIcon();
     }
+
+    // this is a bit hacky at this place; consider to introduce an event so that logic can go into another class
+    ShrinkIfMaximized();
   }
 
   private void RefreshTitle()
@@ -138,8 +141,19 @@ public class OsWindow : DependencyObject
     }
   }
 
+  private void ShrinkIfMaximized()
+  {
+    var isMaximized = Win32.IsZoomed(RootHandle);
+    if (!isMaximized) return;
+
+    // TODO
+  }
+
   private void RefreshIsActive(IntPtr foregroundWindowHandle, IEnumerable<IntPtr> childWindowHandles)
   {
+    // keep active state untouched if FreedomTaskbar itself is the active window
+    if (Application.Current.MainWindow?.IsActive == true) return;
+
     IsActive = childWindowHandles.Contains(foregroundWindowHandle);
   }
 

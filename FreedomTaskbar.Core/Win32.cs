@@ -60,6 +60,19 @@ public class Win32
   [DllImport("user32.dll")]
   public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+  /// <summary>
+  /// If the window is maximized
+  /// </summary>
+  [DllImport("user32.dll")]
+  public static extern bool IsZoomed(IntPtr hWnd);
+
+  /// <summary>
+  /// If the window is minimized
+  /// </summary>
+  [DllImport("user32.dll")]
+  public static extern bool IsIconic(IntPtr hWnd);
+
+
   public const int SW_HIDE = 0;
   public const int SW_SHOWNORMAL = 1;
   public const int SW_SHOWMINIMIZED = 2;

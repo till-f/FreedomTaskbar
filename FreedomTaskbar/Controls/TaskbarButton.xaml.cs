@@ -121,7 +121,14 @@ public partial class TaskbarButton : UserControl
     }
     else
     {
-      Win32.SwitchToThisWindow(Window.RootHandle, true);
+      if (Window.IsActive)
+      {
+        Win32.ShowWindow(Window.RootHandle, Win32.SW_MINIMIZE);
+      }
+      else
+      {
+        Win32.SwitchToThisWindow(Window.RootHandle, true);
+      }
     }
   }
 
