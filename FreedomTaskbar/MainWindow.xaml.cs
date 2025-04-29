@@ -191,7 +191,6 @@ public partial class MainWindow : Window
     // if moved down, insert it behind (otherwise, it is inserted before)
 
     var sourceButton = TaskbarButtons.First(it => it.Window.RootHandle.ToString() == e.DroppedWindowHandle);
-    var oldIdx = TaskbarButtonsStackPanel.Children.IndexOf(sourceButton);
     var newIdx = TaskbarButtonsStackPanel.Children.IndexOf(e.TargetButton);
 
     TaskbarButtonsStackPanel.Children.Remove(sourceButton);
