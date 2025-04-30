@@ -13,7 +13,15 @@ using Timer = System.Timers.Timer;
 namespace FreedomTaskbar;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Feature backlog:
+///  - Fix icon for some apps (use Win32 API to get icon instead of extracting from process main module file)
+///  - Put windows of same process together (important: still allow to move buttons away freely)
+///    - new windows are always added behind the last windows of the same process
+///  - Pin apps and persist (on disk) the order/position for pinned apps:
+///    - the position of the button for first window of a pinned app defines the position in relation to other pinned apps
+///    - if last window of pinned app is closed, a button for the pinned app stays at position of the last closed window
+///    - if first window for a pinned app is opened, the button for the pinned app is replaced by a button for the window
+///  - Start apps not as admin even though the taskbar runs as admin (un-escalate privileges), e.g. when using SHIFT+click to start a 2nd instance
 /// </summary>
 public partial class MainWindow : Window
 {
