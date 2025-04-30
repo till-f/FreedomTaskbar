@@ -102,7 +102,7 @@ public partial class MainWindow : Window
   {
     TaskbarSide = side;
 
-    // TODO: use Win32 API somehow to get rid of this hard-coded value
+    // TODO: consider DPI and/or use Win32 APIs to get rid of this hard-coded value
     int strangeWindowPaddingY = -16;
 
     Top = 0;

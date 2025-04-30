@@ -148,12 +148,13 @@ public class OsWindow : DependencyObject
     var isMaximized = Win32.IsZoomed(RootHandle);
     if (!isMaximized) return;
 
-    var pos = Win32Utils.GetWindowClientRect(RootHandle);
-    if (pos.X < -40 || pos.X > 40 || pos.Y < -40 || pos.Y > 40)
+    // skip if window is maximized on a different screen than primary screen (primary screen always has (0,0) as top-left coordinate)
+    // the offset of 200 pixels accounts for Windows' weird border/offset around windows. the high value was chosen to ensure that
+    // it works for high DPI displays as well. there is probably no more screen in use that's only 400 pixels wide or high.
+    Win32.GetWindowRect(RootHandle, out var pos);
+    if (pos.X < -200 || pos.X > 200 || pos.Y < -200 || pos.Y > 200)
     {
-      // skip if window is maximized on a different screen than primary screen
-      // (primary screen always has (0,0) as top-left coordinate)
-      // also forget restore position (so that pseudo-maximisation is used next time on primary monitor)
+      // also forget _posRestore so that pseudo-maximisation is used again when maximized on the primary monitor later
       _posRestore = null;
       return;
     }
@@ -171,7 +172,7 @@ public class OsWindow : DependencyObject
       int y = 0;
 
       // Apply adjustment for Windows' weird border/offset around windows
-      // TODO: consider to use this method instead of manually picked values:
+      // TODO: consider DPI and/or use this method instead of manually picked values:
       // Win32.AdjustWindowRectExForDpi(ref posMaximized, wi.dwStyle, false, wi.dwExStyle, 96);
       y += 5;
       width -= 16;
