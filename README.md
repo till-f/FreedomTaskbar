@@ -1,7 +1,7 @@
 Background
 ----------
 
-This application was created, because since Microsoft Windows 11, the original taskbar cannot be moved to the left or the right side of the screen anymore.
+This application was created, because the taskbar of Microsoft Windows 11 cannot be moved to the left or the right side of the screen.
 This feature has always been available in Windows, but was removed without a clear reason. Having the taskbar on the side has several advantages:
 
 * Better use of available space, especially with wide monitors or multi monitor setups
