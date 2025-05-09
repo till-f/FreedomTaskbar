@@ -13,13 +13,22 @@ using Timer = System.Timers.Timer;
 namespace FreedomTaskbar;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Feature backlog:
+///  - Fix icon for some apps (use Win32 API to get icon instead of extracting from process main module file)
+///  - Put windows of same process together (important: still allow to move buttons away freely)
+///    - new windows are always added behind the last windows of the same process
+///  - Pin apps and persist (on disk) the order/position for pinned apps:
+///    - the position of the button for first window of a pinned app defines the position in relation to other pinned apps
+///    - if last window of pinned app is closed, a button for the pinned app stays at position of the last closed window
+///    - if first window for a pinned app is opened, the button for the pinned app is replaced by a button for the window
+///  - Start apps not as admin even though the taskbar runs as admin (un-escalate privileges), e.g. when using SHIFT+click to start a 2nd instance
 /// </summary>
 public partial class MainWindow : Window
 {
-  public const string MainWindowTitle = "Freedom Taskbar";
+  public static ESide TaskbarSide { get; private set; } = ESide.Right;
 
-  private const int TaskbarWidth = 200;
+  public const string MainWindowTitle = "Freedom Taskbar";
+  public const int TaskbarWidth = 200;
 
   private readonly Timer _refreshTimer = new (200);
   private readonly List<string> _excludedWindows = [];
@@ -99,6 +108,9 @@ public partial class MainWindow : Window
 
   private void MoveToSide(ESide side)
   {
+    TaskbarSide = side;
+
+    // TODO: consider DPI and/or use Win32 APIs to get rid of this hard-coded value
     int strangeWindowPaddingY = -16;
 
     Top = 0;
@@ -191,7 +203,6 @@ public partial class MainWindow : Window
     // if moved down, insert it behind (otherwise, it is inserted before)
 
     var sourceButton = TaskbarButtons.First(it => it.Window.RootHandle.ToString() == e.DroppedWindowHandle);
-    var oldIdx = TaskbarButtonsStackPanel.Children.IndexOf(sourceButton);
     var newIdx = TaskbarButtonsStackPanel.Children.IndexOf(e.TargetButton);
 
     TaskbarButtonsStackPanel.Children.Remove(sourceButton);
@@ -199,4 +210,4 @@ public partial class MainWindow : Window
   }
 }
 
-enum ESide { Left, Right }
+public enum ESide { Left, Right }

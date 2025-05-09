@@ -12,6 +12,7 @@
           Margin="0, 0, 0, 1"
           Foreground="White"
           Background="{x:Static local:TaskbarButton.ColorInactive}"
+          ToolTip="{Binding ElementName=ThisTaskbarButton, Path=Window.Title}"
           BorderThickness="0">
     <Button.Style>
       <Style TargetType="{x:Type Button}">
