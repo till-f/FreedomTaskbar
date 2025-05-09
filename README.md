@@ -28,22 +28,24 @@ Supported Features
 ------------------
 
  - Showing an _additional_ taskbar on the right or left side of the primary screen
- - Free ordering of tasbar buttons
+ - Free ordering of taskbar buttons
  - Highlighting of the active window
- - Special handling of maximized windows on the primary screen (shrinks them so that they are not hidden behind the taskbar application)
- - Starting a second instance of an application by Shift+Click a taskbar button
+ - Special handling of maximized windows on the primary screen (adjusts size automatically so that they are not covered behind the Freedom Taskbar)
+ - Starting a second instance of an application with Shift+Click on a taskbar button
  - Closing a window or killing the application with a right click
 
-Known Limitations:
+Known Limitations (fix planned):
 ------------------
 
  - If the taskbar is running with user priviledges (not as administrator), no icon is shown for applications that are running with elevated priviledges
  - Icon of some applications is not shown properly (this is related to previous limitation and could be fixed quite easily)
  - Windows Store Apps (also Calculater App, Settings App) are not shown
 
-Wanted Features:
+Planned Features:
 ----------------
 
- - Pinning appliations
- - Remember ordering and grouping of applications
- - Cosmetic improvements, animations
+ - Pinning (keep icon when app is closed)
+ - Remember ordering
+ - Grouping (show new button next to other buttons of same app, if existing)
+ - Bring window to primary screen
+ - Cosmetic improvements like animations
