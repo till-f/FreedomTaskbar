@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreedomTaskbar", "FreedomTa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreedomTaskbar.Core", "FreedomTaskbar.Core\FreedomTaskbar.Core.csproj", "{9BAC00AF-944F-4C43-94D6-2D56A7B7D272}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreedomTaskbar.WinFormsFacade", "FreedomTaskbar.WinFormsFacade\FreedomTaskbar.WinFormsFacade.csproj", "{8491E763-FC08-4BFF-B75C-7F8996807818}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9BAC00AF-944F-4C43-94D6-2D56A7B7D272}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BAC00AF-944F-4C43-94D6-2D56A7B7D272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BAC00AF-944F-4C43-94D6-2D56A7B7D272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8491E763-FC08-4BFF-B75C-7F8996807818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8491E763-FC08-4BFF-B75C-7F8996807818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8491E763-FC08-4BFF-B75C-7F8996807818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8491E763-FC08-4BFF-B75C-7F8996807818}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

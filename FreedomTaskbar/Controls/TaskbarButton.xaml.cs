@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using FreedomTaskbar.Core;
 using FreedomTaskbar.ViewModel;
+using FreedomTaskbar.WinFormsFacade;
 using FreedomTaskbar.WpfExtensions;
 
 namespace FreedomTaskbar.Controls;
@@ -41,6 +42,35 @@ public partial class TaskbarButton : UserControl
     InnerButton.Drop += OnInnerButtonDrop;
 
     UpdateBackground();
+
+    UpdateScreens();
+  }
+
+  private void UpdateScreens()
+  {
+    MaximizeToMenu.Items.Clear();
+    
+    foreach (var screen in GenericScreen.AllScreens)
+    {
+      var item = new MenuItem
+      {
+        Header = $"Screen {screen.ScreenIndex}"
+      };
+
+      item.Click += (s, e) =>
+      {
+        if (screen.IsPrimary)
+        {
+          Win32.SetWindowPos(Window.RootHandle, IntPtr.Zero, screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height, 0);
+        }
+        else
+        {
+          Win32.SetWindowPos(Window.RootHandle, IntPtr.Zero, screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height, 0);
+          Win32.ShowWindow(Window.RootHandle, Win32.SW_SHOWMAXIMIZED);
+        }
+      };
+      MaximizeToMenu.Items.Add(item);
+    }
   }
 
   private void OnInnerButtonPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

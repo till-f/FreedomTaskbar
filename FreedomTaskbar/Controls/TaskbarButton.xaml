@@ -34,6 +34,8 @@
         <MenuItem Header="Close" Click="MenuItemClose_OnClick"/>
         <Separator/>
         <MenuItem Header="Kill" Click="MenuItemKill_OnClick"/>
+        <Separator/>
+        <MenuItem Name="MaximizeToMenu" Header="Maximize on..."/>
       </ContextMenu>
     </Button.ContextMenu>
 
