@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FreedomTaskbar.Core\FreedomTaskbar.Core.csproj" />
+    <ProjectReference Include="..\FreedomTaskbar.WinFormsFacade\FreedomTaskbar.WinFormsFacade.csproj" />
   </ItemGroup>
 
 </Project>
