@@ -6,6 +6,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FreedomTaskbar.WpfExtensions;
 using System.Diagnostics;
+using System.Windows.Media.Media3D;
+using FreedomTaskbar.WinFormsFacade;
 
 namespace FreedomTaskbar.ViewModel;
 
@@ -53,7 +55,26 @@ public class OsWindow : DependencyObject
     private set => SetValue(IsActiveProperty, value);
   }
 
-  public List<IntPtr> ChildWindows { get; } = new ();
+  public void SetRestorePositionAndMaximize(GenericScreen screen)
+  {
+    Win32.GetWindowRect(RootHandle, out var currentPos);
+
+    if (screen.IsPrimary)
+    {
+      // on the primary screen, always restore to the pseudo-maximized position.
+      var primScreenArea = CalcPseudoMaximizedRect();
+      _posRestore = primScreenArea;
+
+      // un-maximize before moving to the pseudo-maximized position. otherwise the windows is moved to the wrong position when it was maximized on a secondary screen (ShrinkIfMaximize is triggered).
+      Win32.ShowWindow(RootHandle, Win32.SW_SHOWNORMAL);
+      Win32.SetWindowPos(RootHandle, IntPtr.Zero, primScreenArea.X, primScreenArea.Y, primScreenArea.Width, primScreenArea.Height, 0);
+    }
+    else
+    {
+      Win32.SetWindowPos(RootHandle, IntPtr.Zero, screen.Bounds.X, screen.Bounds.Y, currentPos.Width, currentPos.Height, 0);
+      Win32.ShowWindow(RootHandle, Win32.SW_SHOWMAXIMIZED);
+    }
+  }
 
   /// <summary>
   /// Queries the current state of the window from the OS and updates relevant properties.
@@ -96,9 +117,6 @@ public class OsWindow : DependencyObject
   {
     RefreshTitle();
     RefreshIsActive(foregroundWindowHandle, childWindowHandles);
-
-    ChildWindows.Clear();
-    ChildWindows.AddRange(childWindowHandles);
 
     if (initStaticProperties)
     {
@@ -165,19 +183,7 @@ public class OsWindow : DependencyObject
     Win32.RECT newPos;
     if (_posRestore == null)
     {
-      // no position is remembered; calculate position for pseudo-maximized window and remember previous size
-      int width = (int)SystemParameters.MaximizedPrimaryScreenWidth - MainWindow.TaskbarWidth;
-      int height = (int)SystemParameters.MaximizedPrimaryScreenHeight;
-      int x =  MainWindow.TaskbarSide == ESide.Right ? 0 : MainWindow.TaskbarWidth;
-      int y = 0;
-
-      // Apply adjustment for Windows' weird border/offset around windows
-      // TODO: consider DPI and/or use this method instead of manually picked values:
-      // Win32.AdjustWindowRectExForDpi(ref posMaximized, wi.dwStyle, false, wi.dwExStyle, 96);
-      y += 5;
-      width -= 16;
-      height -= 26;
-      newPos = new Win32.RECT(x, y, x + width, y + height);
+      newPos = CalcPseudoMaximizedRect();
 
       Win32.GetWindowRect(RootHandle, out Win32.RECT wRect);
       _posRestore = wRect;
@@ -194,6 +200,23 @@ public class OsWindow : DependencyObject
     var newY = newPos.Top < 0 ? 0 : newPos.Top;
 
     Win32.SetWindowPos(RootHandle, 0, newX, newY, newPos.Width, newPos.Height, Win32.SWP_NOZORDER);
+  }
+
+  private Win32.RECT CalcPseudoMaximizedRect()
+  {
+    // no position is remembered; calculate position for pseudo-maximized window and remember previous size
+    int width = (int)SystemParameters.MaximizedPrimaryScreenWidth - MainWindow.TaskbarWidth;
+    int height = (int)SystemParameters.MaximizedPrimaryScreenHeight;
+    int x = MainWindow.TaskbarSide == ESide.Right ? 0 : MainWindow.TaskbarWidth;
+    int y = 0;
+
+    // Apply adjustment for Windows' weird border/offset around windows
+    // TODO: consider DPI and/or use this method instead of manually picked values:
+    // Win32.AdjustWindowRectExForDpi(ref posMaximized, wi.dwStyle, false, wi.dwExStyle, 96);
+    y += 5;
+    width -= 16;
+    height -= 26;
+    return new Win32.RECT(x, y, x + width, y + height);
   }
 
   private void RefreshIsActive(IntPtr foregroundWindowHandle, IEnumerable<IntPtr> childWindowHandles)

@@ -59,16 +59,9 @@ public partial class TaskbarButton : UserControl
 
       item.Click += (s, e) =>
       {
-        if (screen.IsPrimary)
-        {
-          Win32.SetWindowPos(Window.RootHandle, IntPtr.Zero, screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height, 0);
-        }
-        else
-        {
-          Win32.SetWindowPos(Window.RootHandle, IntPtr.Zero, screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height, 0);
-          Win32.ShowWindow(Window.RootHandle, Win32.SW_SHOWMAXIMIZED);
-        }
+        Window.SetRestorePositionAndMaximize(screen);
       };
+
       MaximizeToMenu.Items.Add(item);
     }
   }
