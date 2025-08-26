@@ -161,7 +161,34 @@ public partial class MainWindow : Window
 
       var tbb = new TaskbarButton(osWindow);
       tbb.WindowHandleDropped += OnWindowHandleDropped;
+      AutoPlaceNewButton(tbb);
+    }
+  }
+
+  private void AutoPlaceNewButton(TaskbarButton tbb)
+  {
+    var idx = -1;
+    var exePath = tbb.Window.ProcessExePath;
+
+    if (exePath != null)
+    {
+      var taskbarButtons = TaskbarButtons.ToArray();
+      for (idx = taskbarButtons.Length - 1; idx >= 0; idx--)
+      {
+        if (exePath == taskbarButtons[idx].Window.ProcessExePath)
+        {
+          break;
+        }
+      }
+    }
+
+    if (idx < 0) 
+    {
       TaskbarButtonsStackPanel.Children.Add(tbb);
+    }
+    else
+    {
+      TaskbarButtonsStackPanel.Children.Insert(idx + 1, tbb);
     }
   }
 

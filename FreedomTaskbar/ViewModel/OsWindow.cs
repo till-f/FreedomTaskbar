@@ -6,7 +6,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FreedomTaskbar.WpfExtensions;
 using System.Diagnostics;
-using System.Windows.Media.Media3D;
 using FreedomTaskbar.WinFormsFacade;
 
 namespace FreedomTaskbar.ViewModel;
@@ -31,6 +30,23 @@ public class OsWindow : DependencyObject
   public IntPtr RootHandle { get; }
 
   public Process? Process { get; }
+
+  public string? ProcessExePath
+  {
+    get
+    {
+      try
+      {
+        return Process?.MainModule?.FileName;
+      }
+      catch
+      {
+        // Win32Exception: "Access is denied." may be thrown when MainModule cannot be accessed for
+        // elevated process. This can only be avoided by running FreedomTaskbar as administrator.
+        return null;
+      }
+    }
+  }
 
   public event Action<string, string>? TitleChanged;
   public static readonly DependencyPropertyKey TitleProperty = RegisterProperty(x => x.Title).OnChange(OnTitleChanged);
@@ -144,7 +160,7 @@ public class OsWindow : DependencyObject
   {
     try
     {
-      var exePath = Process?.MainModule?.FileName;
+      var exePath = ProcessExePath;
       if (exePath == null) return;
 
       var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
@@ -155,8 +171,6 @@ public class OsWindow : DependencyObject
     }
     catch
     {
-      // Win32Exception: "Access is denied." may be thrown when MainModule cannot be accessed for
-      // elevated process. This can only be avoided by running FreedomTaskbar as administrator.
       Debug.WriteLine($"Failed to extract icon for window '{Title}'");
     }
   }

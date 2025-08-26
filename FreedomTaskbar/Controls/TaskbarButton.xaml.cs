@@ -57,7 +57,7 @@ public partial class TaskbarButton : UserControl
         Header = $"Screen {screen.ScreenIndex}"
       };
 
-      item.Click += (s, e) =>
+      item.Click += (_, _) =>
       {
         Window.SetRestorePositionAndMaximize(screen);
       };
@@ -133,7 +133,7 @@ public partial class TaskbarButton : UserControl
   {
     if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
     {
-      var si = Window.Process?.MainModule?.FileName;
+      var si = Window.ProcessExePath;
       if (si != null && si.ToLower().EndsWith(".exe"))
       {
         Process.Start(si);
