@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -33,6 +33,8 @@ public partial class MainWindow : Window
   private readonly Timer _refreshTimer = new (200);
   private readonly List<string> _excludedWindows = [];
 
+  private int? _lastPrimaryScreenWidth;
+
   public MainWindow()
   {
     InitializeComponent();
@@ -54,7 +56,11 @@ public partial class MainWindow : Window
 
   private void RefreshTimer_OnElapsed(object? sender, ElapsedEventArgs e)
   {
-    Dispatcher.InvokeAsync(RefreshWindowList);
+    Dispatcher.InvokeAsync(() =>
+    {
+      RefreshTaskbarPosition();
+      RefreshWindowList();
+    });
   }
 
   private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
@@ -162,6 +168,18 @@ public partial class MainWindow : Window
       var tbb = new TaskbarButton(osWindow);
       tbb.WindowHandleDropped += OnWindowHandleDropped;
       AutoPlaceNewButton(tbb);
+    }
+  }
+
+  /// <summary>
+  /// remembers the current primary screen width and refreshes the taskbar position if it has changed
+  /// </summary>
+  private void RefreshTaskbarPosition()
+  {
+    if (_lastPrimaryScreenWidth != (int)SystemParameters.PrimaryScreenWidth)
+    {
+      _lastPrimaryScreenWidth = (int)SystemParameters.PrimaryScreenWidth;
+      MoveToSide(TaskbarSide);
     }
   }
 
